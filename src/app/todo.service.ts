@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Todo } from './todo'
 import { v4 as uuid } from 'uuid'
 import _ from 'lodash'
+import * as moment from 'moment'
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class TodoService {
   }
 
   addTodo(text: string): void{
-    let todo = new Todo(uuid() , text)
+    let todo = new Todo(uuid() , text.trim())
     // console.log(todo)
     let todos = this.getTodos()
     todos.unshift(todo)
@@ -37,6 +38,23 @@ export class TodoService {
     console.log(found)
     todos.splice(todos.indexOf(found), 1)
     this.setLocalTodo(todos);
+  }
+
+  searchByName(searchText: string): Todo[] {
+    let reg = new RegExp(searchText, 'i');
+    let todos = this.getTodos()
+    return todos.filter(item =>{
+      return item.name.match(reg)
+    })
+  }
+
+  searchByDate(searchDate: string): Todo[]{
+    let dt = moment(searchDate).format('DD MMM YYYY')
+    let reg = new RegExp(dt, 'i');
+    let todos = this.getTodos()
+    return todos.filter(item => {
+      return item.createdAt.match(reg)
+    })
   }
 
   private setLocalTodo(todos: Todo[]): void {

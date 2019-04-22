@@ -1,6 +1,7 @@
 
 <li class="todo-item">
-  {{ todo.name }}
+  <strong>{{ todo.name }}</strong><br>
+  <span class="text-muted">{{ todo.createdAt | date:'medium'}}</span>
   <span class="pull-right">
     <a (click)="editTodo(todo)" class="btn btn-xs">Edit</a>
     <a (click)="deleteTodo(todo)" class="btn btn-xs">Delete</a>

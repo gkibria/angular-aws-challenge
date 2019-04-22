@@ -3,9 +3,44 @@
     <div class="col-md-6 col-md-offset-3">
         <h3 class="text-center">Angular Todo</h3>
         <hr>
-        <app-todo-form (change)="refreshList()"></app-todo-form>
+        
+        <div>
+          <ul class="nav nav-tabs">
+            <li [class.active]="tab == 'add'"><a href="#" (click)="tab = 'add'">Add TODO</a></li>
+            <li [class.active]="tab == 'search1'"><a href="#" (click)="tab = 'search1'">Search by Name</a></li>
+            <li [class.active]="tab == 'search2'"><a href="#" (click)="tab = 'search2'">Search by Date</a></li>
+          </ul>
+          <div class="tab-content">
+            <div *ngIf="tab == 'add'" class="active" style="margin-top:10px;">
+                <app-todo-form (change)="refreshList()"></app-todo-form>
+            </div>
+            <div *ngIf="tab == 'search1'" style="margin-top:10px;">
+                <div class="form-group">
+                    <div class="input-group">
+                      <input [(ngModel)]="searchText" type="text" class="form-control" placeholder="enter keyword" required>
+                      <div class="input-group-btn">
+                        <a class="btn btn-primary" (click)="filterTodo()">search</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="tab == 'search2'" style="margin-top:10px;">
+                <div class="form-group">
+                    <div class="input-group">
+                      <input [(ngModel)]="searchDate" type="date" class="form-control" placeholder="dd/mm/yyyy">
+                      <div class="input-group-btn">
+                        <a class="btn btn-primary" (click)="filterTodoByDate()">search</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
         <div class="panel panel-default">
-            <div class="panel-heading">Total Item: {{ todos.length }}</div>
+            <div class="panel-heading">
+              Total Item: {{ todos.length }} <span *ngIf="todoFiltered"><a href="#" (click)="removeFilter()">[remove filter]</a></span>
+            </div>
             <ul class="list-group">
               <app-todo 
                 [todo]="todo" 
