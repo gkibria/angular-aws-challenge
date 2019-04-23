@@ -3,13 +3,17 @@ import { Todo } from './todo'
 import { v4 as uuid } from 'uuid'
 import _ from 'lodash'
 import * as moment from 'moment'
+// import * as AWS from 'aws-sdk/global';
+import * as S3 from 'aws-sdk/clients/s3';
+import { TodoExportSchema } from './todo-export'
+import { HttpClient, HttpHeaders} from '@angular/common/http'
 
 @Injectable({
   providedIn: 'root'
 })
 export class TodoService {
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   getTodos(): Todo[]{
     let localItem = JSON.parse(localStorage.getItem('todos'))
@@ -57,7 +61,39 @@ export class TodoService {
     })
   }
 
-  private setLocalTodo(todos: Todo[]): void {
+  uploadToS3(aws){
+    // console.log(aws)
+    let todos = this.getTodos()
+    const exportFormat = new TodoExportSchema(1, new Date().toUTCString(), todos)
+    const bucket = new S3({
+      accessKeyId: aws.accessKeyId,
+      secretAccessKey: aws.secretAccessKey,
+      region: aws.region
+    })
+    const params = {
+      Bucket: aws.bucket,
+      Key: 'todolist.json',
+      Body: JSON.stringify(exportFormat),
+      ACL: 'public-read',
+      ContentType: 'application/json'
+    }
+
+    bucket.upload(params, (err, data) => {
+      if(err){
+        alert('Something is wrong')
+        console.log(err)
+      }else{
+        console.log(data)
+        alert(`File: ${data.Location}`)
+      }
+    })
+  }
+
+  downloadFromS3(url: string){
+    return this.http.get(url)
+  }
+
+  setLocalTodo(todos: Todo[]): void {
     localStorage.setItem('todos', JSON.stringify({ todos: todos }))
   }
 }
